@@ -1,0 +1,75 @@
+syntax = "proto3";
+
+package inventory.v1;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/PianyCoder/ship-trader/shared/pkg/proto/inventory/v1;inventoryv1";
+
+// InventoryService управляет каталогом деталей для космических кораблей
+service InventoryService {
+  // GetPart возвращает деталь по UUID
+  rpc GetPart(GetPartRequest) returns (GetPartResponse);
+  // ListParts возвращает список деталей с возможностью фильтрации
+  // по типу или по конкретным UUID.
+  rpc ListParts(ListPartsRequest) returns (ListPartsResponse);
+}
+
+// Тип детали
+enum PartType {
+  // Деталь не указана
+  PART_TYPE_UNSPECIFIED = 0;
+  // Корпус корабля
+  PART_TYPE_HULL = 1;
+  // Двигатель
+  PART_TYPE_ENGINE = 2;
+  // Щит (генератор силового поля)
+  PART_TYPE_SHIELD = 3;
+  // Вооружение
+  PART_TYPE_WEAPON = 4;
+}
+
+// Part представляет деталь космического корабля
+message Part {
+  // Уникальный идентификатор детали
+  string uuid = 1;
+  // Название детали
+  string name = 2;
+  // Описание детали
+  string description = 3;
+  // Цена в копейках (5000₽ = 500000)
+  int64 price = 4;
+  // Тип детали
+  PartType part_type = 5;
+  // Количество на складе
+  int64 stock_quantity = 6;
+  // Дата создания
+  google.protobuf.Timestamp created_at = 7;
+}
+
+// Запрос на получение детали по UUID
+message GetPartRequest {
+  // UUID детали, по которой требуется инфа
+  string uuid = 1;
+}
+
+// Ответ с информацией о детали
+message GetPartResponse {
+  // Инфа о конкретной детали
+  Part part = 1;
+}
+
+// Запрос на получение списка деталей
+message ListPartsRequest {
+  // Тип детали, использующийся для фильтрации
+  // UNSPECIFIED => все детали
+  PartType part_type = 1;
+  // Список UUID'ов деталей
+  repeated string uuids = 2;
+}
+
+// Ответ со списком деталей
+message ListPartsResponse {
+  // Список возвращаемых деталей
+  repeated Part parts = 1;
+}
